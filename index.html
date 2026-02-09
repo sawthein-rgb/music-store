@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎸 VibeBeats Music Store</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" id="loginScreen">
+        <div class="login-box">
+            <h1 class="logo">🎸 VibeBeats</h1>
+            <p class="tagline">your music, your vibe ✨</p>
+            
+            <div class="login-form">
+                <input type="text" id="username" placeholder="username" class="input-field">
+                <input type="password" id="password" placeholder="password" class="input-field">
+                <button onclick="login()" class="btn-primary">let's go 🚀</button>
+                
+                <p class="hint">hint: any username/password works for demo 😉</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container hidden" id="chatScreen">
+        <div class="chat-header">
+            <div class="header-left">
+                <h2>🎸 VibeBeats AI</h2>
+                <span class="status-dot"></span>
+                <span class="status-text">online</span>
+            </div>
+            <div class="header-right">
+                <span class="user-name" id="currentUser"></span>
+                <button onclick="logout()" class="btn-logout">logout</button>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will appear here -->
+            </div>
+
+            <div class="suggested-products hidden" id="suggestedProducts">
+                <!-- Products will appear here -->
+            </div>
+        </div>
+
+        <div class="chat-input-container">
+            <input 
+                type="text" 
+                id="messageInput" 
+                placeholder="ask me anything... 'show me guitars under 5 mil' 💬"
+                class="chat-input"
+                onkeypress="if(event.key==='Enter') sendMessage()"
+            >
+            <button onclick="sendMessage()" class="btn-send">send 🚀</button>
+        </div>
+
+        <div class="quick-actions">
+            <button onclick="quickMessage('show me all guitars')" class="quick-btn">🎸 guitars</button>
+            <button onclick="quickMessage('under 5 million')" class="quick-btn">💰 cheap</button>
+            <button onclick="quickMessage('beginner friendly')" class="quick-btn">🌟 beginner</button>
+            <button onclick="quickMessage('show my cart')" class="quick-btn">🛒 cart</button>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="chat-api.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

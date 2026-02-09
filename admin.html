@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎸 Admin Panel - VibeBeats</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container" id="adminLoginScreen">
+        <div class="login-box">
+            <h1 class="logo">🔐 Admin Panel</h1>
+            <p class="tagline">manage your store 💼</p>
+            
+            <div class="login-form">
+                <input type="text" id="adminUsername" placeholder="admin username" class="input-field">
+                <input type="password" id="adminPassword" placeholder="admin password" class="input-field">
+                <button onclick="adminLogin()" class="btn-primary">enter 🚀</button>
+                
+                <p class="hint">hint: use 'admin' for demo 😉</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="container hidden" id="adminScreen">
+        <div class="admin-header">
+            <div class="header-left">
+                <h2>🔐 Admin Dashboard</h2>
+            </div>
+            <div class="header-right">
+                <button onclick="clearAllChats()" class="btn-clear-all" title="Clear all chats">🗑️ clear all</button>
+                <span class="admin-name" id="currentAdmin"></span>
+                <button onclick="adminLogout()" class="btn-logout">logout</button>
+            </div>
+        </div>
+
+        <div class="admin-container">
+            <div class="admin-sidebar">
+                <h3>🔔 Active Chats</h3>
+                <div id="activeChatsList" class="active-chats-list">
+                    <p class="no-chats">no active chats yet... 💤</p>
+                </div>
+            </div>
+
+            <div class="admin-chat-area">
+                <div id="noConversationSelected" class="no-conversation">
+                    <h3>👈 Select a chat to start</h3>
+                    <p>waiting for customers... ⏳</p>
+                </div>
+
+                <div id="conversationView" class="conversation-view hidden">
+                    <div class="conversation-header">
+                        <h3 id="selectedUserName">Chat with User</h3>
+                        <span class="conversation-status">🟢 active</span>
+                    </div>
+
+                    <div class="admin-messages" id="adminMessages">
+                        <!-- Messages appear here -->
+                    </div>
+
+                    <div class="admin-input-container">
+                        <input 
+                            type="text" 
+                            id="adminMessageInput" 
+                            placeholder="reply to customer... 💬"
+                            class="chat-input"
+                            onkeypress="if(event.key==='Enter') sendAdminMessage()"
+                        >
+                        <button onclick="sendAdminMessage()" class="btn-send">send 🚀</button>
+                    </div>
+
+                    <div class="quick-responses">
+                        <button onclick="quickAdminResponse('Hi! How can I help you today? 😊')" class="quick-btn">👋 greet</button>
+                        <button onclick="quickAdminResponse('I can offer you 10% off on that! 💰')" class="quick-btn">💸 discount</button>
+                        <button onclick="quickAdminResponse('This is in stock and ready to ship! 📦')" class="quick-btn">✅ in stock</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>
