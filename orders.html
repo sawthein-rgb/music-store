@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MarketHub V5 — Orders & History</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--bg:#0f0f1a;--neon-purple:#8a2be2;--electric-blue:#00d4ff;--neon-green:#39ff14}
+    body{min-height:100vh;margin:0;background:
+      radial-gradient(900px 400px at 10% 10%, rgba(138,43,226,0.06), transparent 10%),
+      radial-gradient(700px 350px at 90% 90%, rgba(0,212,255,0.04), transparent 10%),
+      linear-gradient(180deg,#07070d 0%,var(--bg) 100%);color:#e6eef8;font-family:Inter,system-ui,Arial;padding:18px}
+    .glass{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(8px);border-radius:14px}
+    .filter-btn{padding:8px 12px;border-radius:12px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#cfe8ff;cursor:pointer}
+    .filter-btn.active{background:linear-gradient(90deg,var(--neon-purple),var(--electric-blue));color:white}
+    .status-badge{padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;display:inline-flex;align-items:center;gap:8px}
+  </style>
+</head>
+<body>
+  <div class="max-w-6xl mx-auto">
+    <div class="glass p-6 rounded-2xl">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-weight:800;font-size:20px">Orders & Payment History</div>
+          <div style="color:#9fb7d6;margin-top:6px">Filter and inspect orders for buyers & sellers</div>
+        </div>
+        <div>
+          <button id="backBtn" class="px-3 py-2 rounded-2xl border border-gray-800">Back</button>
+        </div>
+      </div>
+
+      <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="filter-btn active" data-filter="All">All</button>
+        <button class="filter-btn" data-filter="Pending">Pending</button>
+        <button class="filter-btn" data-filter="Confirmed">Confirmed</button>
+        <button class="filter-btn" data-filter="Preparing">Preparing</button>
+        <button class="filter-btn" data-filter="On The Way">On The Way</button>
+        <button class="filter-btn" data-filter="Delivered">Delivered</button>
+        <button class="filter-btn" data-filter="Completed">Completed</button>
+        <button class="filter-btn" data-filter="Cancelled">Cancelled</button>
+      </div>
+
+      <div id="ordersWrap" class="mt-4 space-y-3 max-h-72 overflow-auto pr-2"></div>
+    </div>
+  </div>
+
+<script>
+/* orders.html - shared order history viewer
+   - Shows orders from localStorage
+   - Filters by status
+   - Accessible to both buyers and sellers (session-based)
+*/
+const KEYS = {
+  ORDERS: 'markethub_v5_orders',
+  PAYMENTS: 'markethub_v5_payments'
+};
+function load(key){ try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e){ return []; } }
+function formatNumber(n){ return n.toLocaleString('id-ID'); }
+
+const ordersWrap = document.getElementById('ordersWrap');
+const filterBtns = document.querySelectorAll('.filter-btn');
+let activeFilter = 'All';
+
+filterBtns.forEach(b=>{
+  b.addEventListener('click', ()=>{
+    filterBtns.forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    activeFilter = b.dataset.filter;
+    renderOrders();
+  });
+});
+
+document.getElementById('backBtn').addEventListener('click', ()=> window.history.back());
+
+function renderOrders(){
+  const orders = load(KEYS.ORDERS).filter(o=> o.type === 'order').sort((a,b)=> new Date(b.createdAt)-new Date(a.createdAt));
+  let filtered = orders;
+  if(activeFilter !== 'All') filtered = orders.filter(o=> o.status === activeFilter);
+  if(filtered.length === 0) ordersWrap.innerHTML = `<div class="text-xs text-gray-400">No orders for this filter.</div>`;
+  else {
+    ordersWrap.innerHTML = '';
+    filtered.forEach(o=>{
+      const div = document.createElement('div');
+      div.className = 'p-3 rounded-2xl border border-gray-800';
+      div.innerHTML = `<div style="display:flex;justify-content:space-between"><div style="font-weight:800">Order ${o.id}</div><div style="font-size:12px;color:#9fb7d6">${new Date(o.createdAt).toLocaleString()}</div></div>
+        <div style="margin-top:8px;color:#cfe8ff">Buyer: ${o.buyerName} • Seller: ${o.sellerId}</div>
+        <div style="margin-top:8px">Items: ${o.items.map(i=>`${i.productName} x${i.qty}`).join(', ')}</div>
+        <div style="margin-top:8px;display:flex;justify-content:space-between;align-items:center"><div style="font-weight:800">Rp${formatNumber(o.total)}</div><div style="font-size:12px;color:#9fb7d6">${o.paymentMethod} • ${o.status}</div></div>
+        <div style="margin-top:8px;color:#9fb7d6">Address: ${o.address || '—'}</div>
+        <div style="margin-top:8px;display:flex;gap:8px"><button data-order="${o.id}" class="view-order-btn px-3 py-1 rounded-2xl border border-gray-700 text-sm text-gray-200">View</button><button data-order="${o.id}" class="view-map-btn px-3 py-1 rounded-2xl neon-btn text-sm text-white">Map</button></div>`;
+      ordersWrap.appendChild(div);
+    });
+    document.querySelectorAll('.view-order-btn').forEach(b=> b.addEventListener('click', e=>{
+      const id = e.currentTarget.dataset.order;
+      const orders = load(KEYS.ORDERS);
+      const o = orders.find(x=>x.id === id);
+      if(!o) return alert('Order not found.');
+      alert(`Order ${o.id}\nBuyer: ${o.buyerName}\nTotal: Rp${formatNumber(o.total)}\nStatus: ${o.status}\nPayment: ${o.paymentMethod}\nAddress: ${o.address || '—'}`);
+    }));
+    document.querySelectorAll('.view-map-btn').forEach(b=> b.addEventListener('click', e=>{
+      const id = e.currentTarget.dataset.order;
+      const orders = load(KEYS.ORDERS);
+      const o = orders.find(x=>x.id === id);
+      if(!o) return alert('Order not found.');
+      if(!o.location) return alert('No location shared.');
+      const { lat, lng } = o.location;
+      const src = `https://www.google.com/maps?q=${lat},${lng}&output=embed`;
+      window.open(src, '_blank');
+    }));
+  }
+}
+
+renderOrders();
+</script>
+</body>
+</html>

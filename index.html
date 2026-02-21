@@ -1,71 +1,118 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎸 VibeBeats Music Store</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MarketHub V5 — Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--bg:#0f0f1a;--neon-purple:#8a2be2;--electric-blue:#00d4ff;--neon-green:#39ff14}
+    body{min-height:100vh;margin:0;background:
+      radial-gradient(800px 400px at 10% 10%, rgba(138,43,226,0.06), transparent 10%),
+      radial-gradient(700px 350px at 90% 90%, rgba(0,212,255,0.04), transparent 10%),
+      linear-gradient(180deg,#07070d 0%,var(--bg) 100%);font-family:Inter,system-ui,Arial;color:#e6eef8;display:flex;align-items:center;justify-content:center;padding:24px}
+    .card{width:100%;max-width:920px;border-radius:18px;padding:28px;background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));box-shadow:0 10px 40px rgba(2,6,23,0.7);border:1px solid rgba(255,255,255,0.04);display:grid;grid-template-columns:1fr 420px;gap:24px}
+    .logo-mark{width:84px;height:84px;border-radius:18px;background:linear-gradient(135deg,var(--neon-purple),var(--electric-blue));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:28px;color:white;box-shadow:0 8px 30px rgba(138,43,226,0.18)}
+    .input{width:100%;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04);color:#e6eef8;outline:none}
+    .role-btn{padding:10px 12px;border-radius:12px;cursor:pointer;border:1px solid rgba(255,255,255,0.04);background:transparent;color:#cfe8ff;transition:all .18s}
+    .role-btn.active{background:linear-gradient(90deg,var(--neon-purple),var(--electric-blue));box-shadow:0 8px 30px rgba(138,43,226,0.12);color:white;transform:translateY(-3px)}
+    .enter-btn{padding:12px 16px;border-radius:14px;background:linear-gradient(90deg,var(--neon-purple),var(--electric-blue));color:white;font-weight:700;border:none;cursor:pointer;box-shadow:0 10px 30px rgba(138,43,226,0.12)}
+    @media (max-width:900px){.card{grid-template-columns:1fr;padding:18px}}
+  </style>
 </head>
 <body>
-    <div class="container" id="loginScreen">
-        <div class="login-box">
-            <h1 class="logo">🎸 VibeBeats</h1>
-            <p class="tagline">your music, your vibe ✨</p>
-            
-            <div class="login-form">
-                <input type="text" id="username" placeholder="username" class="input-field">
-                <input type="password" id="password" placeholder="password" class="input-field">
-                <button onclick="login()" class="btn-primary">let's go 🚀</button>
-                
-                <p class="hint">hint: any username/password works for demo 😉</p>
-            </div>
+  <div class="card">
+    <div>
+      <div style="display:flex;gap:16px;align-items:center">
+        <div class="logo-mark">MH5</div>
+        <div>
+          <div style="font-size:22px;font-weight:900">MarketHub V5</div>
+          <div style="color:#9fb7d6;margin-top:6px">Smart Orders & Payments — in-browser demo</div>
         </div>
+      </div>
+
+      <div style="margin-top:22px;background:rgba(255,255,255,0.02);border-radius:12px;padding:16px;border:1px solid rgba(255,255,255,0.03)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div style="font-weight:800">Sign in</div>
+          <div style="font-size:12px;color:#9fb7d6">Session per tab</div>
+        </div>
+
+        <div style="margin-top:12px">
+          <label class="text-xs text-gray-400">Username</label>
+          <input id="username" class="input mt-2" placeholder="e.g., Nova, Kai, Luna" maxlength="28" />
+        </div>
+
+        <div style="margin-top:12px">
+          <label class="text-xs text-gray-400">Role</label>
+          <div class="mt-2 flex gap-3">
+            <button id="roleBuyer" class="role-btn active" data-role="Buyer">Buyer</button>
+            <button id="roleSeller" class="role-btn" data-role="Seller">Seller</button>
+          </div>
+        </div>
+
+        <div style="margin-top:14px;display:flex;gap:10px;align-items:center">
+          <button id="enterBtn" class="enter-btn">Enter MarketHub V5</button>
+          <div style="color:#9fb7d6;font-size:13px">Session stored in <strong>sessionStorage</strong></div>
+        </div>
+      </div>
     </div>
 
-    <div class="container hidden" id="chatScreen">
-        <div class="chat-header">
-            <div class="header-left">
-                <h2>🎸 VibeBeats AI</h2>
-                <span class="status-dot"></span>
-                <span class="status-text">online</span>
-            </div>
-            <div class="header-right">
-                <span class="user-name" id="currentUser"></span>
-                <button onclick="logout()" class="btn-logout">logout</button>
-            </div>
+    <div>
+      <div style="background:rgba(255,255,255,0.02);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03);height:100%;display:flex;flex-direction:column;justify-content:center">
+        <div style="text-align:center">
+          <div style="font-weight:800;font-size:18px">New: Orders • Payments • Maps • Video</div>
+          <div style="color:#9fb7d6;margin-top:8px">Open multiple tabs and login with different names to simulate multi-user marketplace.</div>
         </div>
 
-        <div class="chat-container">
-            <div class="chat-messages" id="chatMessages">
-                <!-- Messages will appear here -->
-            </div>
-
-            <div class="suggested-products hidden" id="suggestedProducts">
-                <!-- Products will appear here -->
-            </div>
+        <div style="margin-top:18px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)">
+            <div style="font-size:12px;color:#9fb7d6">Buyer Flow</div>
+            <div style="font-weight:700;margin-top:6px">Request → Select products → Cart → Pay → Track</div>
+          </div>
+          <div style="padding:12px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03)">
+            <div style="font-size:12px;color:#9fb7d6">Seller Flow</div>
+            <div style="font-weight:700;margin-top:6px">Create products → Receive orders → Prepare → Deliver</div>
+          </div>
         </div>
-
-        <div class="chat-input-container">
-            <input 
-                type="text" 
-                id="messageInput" 
-                placeholder="ask me anything... 'show me guitars under 5 mil' 💬"
-                class="chat-input"
-                onkeypress="if(event.key==='Enter') sendMessage()"
-            >
-            <button onclick="sendMessage()" class="btn-send">send 🚀</button>
-        </div>
-
-        <div class="quick-actions">
-            <button onclick="quickMessage('show me all guitars')" class="quick-btn">🎸 guitars</button>
-            <button onclick="quickMessage('under 5 million')" class="quick-btn">💰 cheap</button>
-            <button onclick="quickMessage('beginner friendly')" class="quick-btn">🌟 beginner</button>
-            <button onclick="quickMessage('show my cart')" class="quick-btn">🛒 cart</button>
-        </div>
+      </div>
     </div>
+  </div>
 
-    <script src="data.js"></script>
-    <script src="chat-api.js"></script>
-    <script src="app.js"></script>
+<script>
+(function(){
+  const roleBuyer = document.getElementById('roleBuyer');
+  const roleSeller = document.getElementById('roleSeller');
+  const username = document.getElementById('username');
+  const enterBtn = document.getElementById('enterBtn');
+  let selectedRole = 'Buyer';
+  function setActiveRole(btn){
+    document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    selectedRole = btn.dataset.role;
+  }
+  roleBuyer.addEventListener('click', ()=>setActiveRole(roleBuyer));
+  roleSeller.addEventListener('click', ()=>setActiveRole(roleSeller));
+
+  function uid(prefix='u_'){ return prefix + Math.random().toString(36).slice(2,9); }
+
+  enterBtn.addEventListener('click', ()=>{
+    const name = username.value.trim();
+    if(!name) { username.focus(); return alert('Please enter a username.'); }
+    const userId = uid(selectedRole === 'Buyer' ? 'buyer_' : 'seller_');
+    const user = { userId, userName: name, role: selectedRole, createdAt: new Date().toISOString() };
+    sessionStorage.setItem('markethub_v5_session', JSON.stringify(user));
+    // add to global users list for discovery
+    try {
+      const users = JSON.parse(localStorage.getItem('markethub_v5_users') || '[]');
+      users.push({ userId, userName: name, role: selectedRole, createdAt: user.createdAt });
+      localStorage.setItem('markethub_v5_users', JSON.stringify(users));
+    } catch(e){}
+    if(selectedRole === 'Buyer') window.location.href = 'buyer.html';
+    else window.location.href = 'seller.html';
+  });
+
+  username.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') enterBtn.click(); });
+})();
+</script>
 </body>
 </html>

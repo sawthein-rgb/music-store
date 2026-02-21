@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MarketHub V5 — Seller</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--bg:#0f0f1a;--neon-purple:#8a2be2;--electric-blue:#00d4ff;--neon-green:#39ff14}
+    body{min-height:100vh;margin:0;background:
+      radial-gradient(900px 400px at 10% 10%, rgba(138,43,226,0.06), transparent 10%),
+      radial-gradient(700px 350px at 90% 90%, rgba(0,212,255,0.04), transparent 10%),
+      linear-gradient(180deg,#07070d 0%,var(--bg) 100%);color:#e6eef8;font-family:Inter,system-ui,Arial;padding:18px}
+    .glass{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(8px);border-radius:14px}
+    .neon-btn{background:linear-gradient(90deg,var(--neon-purple),var(--electric-blue));color:white;padding:10px 14px;border-radius:12px;border:none;cursor:pointer}
+    .status-badge{padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;display:inline-flex;align-items:center;gap:8px}
+    .card-hover:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(0,0,0,0.6),0 0 30px rgba(138,43,226,0.06)}
+    video.preview{width:220px;height:120px;object-fit:cover;border-radius:10px}
+    @media (max-width:900px){.layout-grid{grid-template-columns:1fr!important}}
+  </style>
+</head>
+<body>
+  <div id="app" class="max-w-6xl mx-auto layout-grid grid grid-cols-3 gap-6">
+    <!-- Left: Seller Profile & Product Form -->
+    <div class="glass p-6 rounded-2xl col-span-1">
+      <div class="flex items-center gap-4">
+        <div id="avatar" class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-700 to-blue-400 flex items-center justify-center text-2xl font-bold text-white">S</div>
+        <div>
+          <div class="text-xs text-gray-300">Signed in as</div>
+          <div id="userName" class="text-lg font-semibold">Seller</div>
+          <div class="text-xs text-gray-400 mt-1">ID: <span id="userId" class="font-mono"></span></div>
+        </div>
+      </div>
+
+      <hr class="my-4 border-gray-800" />
+
+      <h3 class="text-lg font-semibold">Create Product</h3>
+      <div class="mt-3 space-y-3">
+        <input id="productName" class="w-full p-3 rounded-2xl glass border border-gray-800 text-sm outline-none" placeholder="Product name (e.g., Fruit Tea)" />
+        <input id="category" class="w-full p-3 rounded-2xl glass border border-gray-800 text-sm outline-none" placeholder="Category (optional)" />
+        <input id="pricePerUnit" type="number" class="w-full p-3 rounded-2xl glass border border-gray-800 text-sm outline-none" placeholder="Price per unit (Rp)" />
+        <input id="qtyAvailable" type="number" class="w-full p-3 rounded-2xl glass border border-gray-800 text-sm outline-none" placeholder="Quantity available" />
+        <div class="flex gap-2">
+          <select id="tempOptions" class="p-3 rounded-2xl glass border border-gray-800 w-full">
+            <option value="">Temperature options (comma separated)</option>
+          </select>
+          <input id="notes" class="w-full p-3 rounded-2xl glass border border-gray-800 text-sm outline-none" placeholder="Notes (optional)" />
+        </div>
+        <div class="flex gap-2 items-center">
+          <button id="recordVideoBtn" class="px-3 py-2 rounded-2xl border border-gray-800 text-sm text-gray-200">Record Short Video</button>
+          <div id="videoPreviewWrap"></div>
+        </div>
+        <div class="flex gap-2">
+          <button id="createProductBtn" class="neon-btn">Create Product</button>
+          <button id="logoutBtn" class="px-3 py-2 rounded-2xl border border-gray-800 text-sm text-gray-300">Logout</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle: Requests & Orders -->
+    <div class="glass p-6 rounded-2xl col-span-1">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-sm text-gray-400">Requests</div>
+          <div class="text-lg font-semibold">Buyer Requests</div>
+        </div>
+        <div class="text-xs text-gray-400">Realtime</div>
+      </div>
+
+      <div id="requestsList" class="mt-4 space-y-3 max-h-96 overflow-auto pr-2"></div>
+    </div>
+
+    <!-- Right: Products & Active Deals -->
+    <div class="glass p-6 rounded-2xl col-span-1">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-sm text-gray-400">Products</div>
+          <div class="text-lg font-semibold">Your Catalog</div>
+        </div>
+        <div class="text-xs text-gray-400">Manage</div>
+      </div>
+
+      <div id="myProducts" class="mt-4 space-y-3 max-h-64 overflow-auto pr-2"></div>
+
+      <hr class="my-4 border-gray-800" />
+
+      <div>
+        <div class="text-sm text-gray-400">Active Orders</div>
+        <div id="activeOrders" class="mt-3 space-y-3 max-h-56 overflow-auto"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Video Recorder Modal -->
+  <div id="videoModal" class="fixed inset-0 z-50 hidden items-center justify-center p-6">
+    <div class="w-full max-w-lg glass rounded-2xl p-4 relative">
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-lg font-semibold">Record Short Video (max 20s)</div>
+        <div class="text-xs text-gray-400">Seller demo</div>
+      </div>
+
+      <div style="display:flex;gap:12px;align-items:center">
+        <video id="recPreview" autoplay muted playsinline class="preview" style="background:black"></video>
+        <div style="flex:1">
+          <div id="recTimer" class="text-sm text-gray-400">00:00</div>
+          <div class="mt-3 flex gap-2">
+            <button id="startRec" class="neon-btn">Start</button>
+            <button id="stopRec" class="px-3 py-2 rounded-2xl border border-gray-800 text-sm text-gray-200">Stop</button>
+            <button id="saveRec" class="px-3 py-2 rounded-2xl border border-gray-800 text-sm text-gray-200">Save</button>
+          </div>
+        </div>
+      </div>
+
+      <button id="closeVideoModal" class="absolute top-3 right-3 text-gray-400">✕</button>
+    </div>
+  </div>
+
+<script src="seller.js"></script>
+</body>
+</html>

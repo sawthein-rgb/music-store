@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MarketHub V5 — Buyer</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root{--bg:#0f0f1a;--neon-purple:#8a2be2;--electric-blue:#00d4ff;--neon-green:#39ff14}
+    body{min-height:100vh;margin:0;background:
+      radial-gradient(900px 400px at 10% 10%, rgba(138,43,226,0.06), transparent 10%),
+      radial-gradient(700px 350px at 90% 90%, rgba(0,212,255,0.04), transparent 10%),
+      linear-gradient(180deg,#07070d 0%,var(--bg) 100%);color:#e6eef8;font-family:Inter,system-ui,Arial;padding:18px}
+    .glass{background:linear-gradient(180deg,rgba(255,255,255,0.02),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.04);backdrop-filter:blur(8px);border-radius:14px}
+    .neon-btn{background:linear-gradient(90deg,var(--neon-purple),var(--electric-blue));color:white;padding:10px 14px;border-radius:12px;border:none;cursor:pointer}
+    .status-badge{padding:6px 10px;border-radius:999px;font-weight:700;font-size:12px;display:inline-flex;align-items:center;gap:8px}
+    .bubble{max-width:78%;padding:10px 14px;border-radius:14px;line-height:1.2;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
+    .bubble.me{background:linear-gradient(90deg, rgba(138,43,226,0.18), rgba(0,212,255,0.06));color:#fff}
+    .bubble.them{background:rgba(255,255,255,0.03);color:#dbeafe}
+    .floating-total{position:fixed;right:20px;bottom:20px;background:linear-gradient(90deg,var(--neon-purple),var(--electric-blue));padding:14px;border-radius:14px;color:white;box-shadow:0 10px 30px rgba(138,43,226,0.12);z-index:60}
+    @media (max-width:900px){.layout-grid{grid-template-columns:1fr!important}.floating-total{left:12px;right:12px}}
+  </style>
+</head>
+<body>
+  <div id="app" class="max-w-6xl mx-auto layout-grid grid grid-cols-3 gap-6">
+    <!-- Left: Profile & Request -->
+    <div class="glass p-6 rounded-2xl col-span-1">
+      <div class="flex items-center gap-4">
+        <div id="avatar" class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-700 to-blue-400 flex items-center justify-center text-2xl font-bold text-white">B</div>
+        <div>
+          <div class="text-xs text-gray-300">Signed in as</div>
+          <div id="userName" class="text-lg font-semibold">Buyer</div>
+          <div class="text-xs text-gray-400 mt-1">ID: <span id="userId" class="font-mono"></span></div>
+        </div>
+      </div>
+
+      <hr class="my-4 border-gray-800" />
+
+      <div id="requestArea">
+        <h3 class="text-lg font-semibold">Post a Request</h3>
+        <p class="text-xs text-gray-400">Describe what you want — sellers will create products you can order.</p>
+        <div class="mt-3 space-y-3">
+          <input id="requestText" class="w-full p-3 rounded-2xl glass border border-gray-800 text-sm outline-none" placeholder="e.g., something sweet 2 hot 3" />
+          <div class="flex gap-2">
+            <button id="postRequestBtn" class="neon-btn">Post Request</button>
+            <button id="logoutBtn" class="px-3 py-2 rounded-2xl border border-gray-800 text-sm text-gray-300">Logout</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="myRequestInfo" class="hidden mt-4">
+        <h3 class="text-lg font-semibold">Your Request</h3>
+        <div class="p-3 rounded-2xl border border-gray-800 mt-2">
+          <div class="text-xs text-gray-400">Request</div>
+          <div id="reqText" class="font-semibold text-lg"></div>
+          <div class="mt-3">
+            <div class="text-xs text-gray-400">Deal Status</div>
+            <div id="dealStatusBadge" class="status-badge mt-2 text-sm rounded-full">Pending</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Middle: Products & Cart -->
+    <div class="glass p-6 rounded-2xl col-span-1 flex flex-col">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-sm text-gray-400">Marketplace</div>
+          <div class="text-lg font-semibold">Products from Sellers</div>
+        </div>
+        <div class="text-xs text-gray-400">Realtime</div>
+      </div>
+
+      <div id="productsList" class="mt-4 space-y-3 overflow-auto pr-2 flex-1"></div>
+
+      <div class="mt-4">
+        <h4 class="text-sm text-gray-300">Cart</h4>
+        <div id="cartList" class="mt-2 space-y-2"></div>
+        <div class="mt-3 flex gap-2">
+          <button id="checkoutBtn" class="neon-btn" disabled>Checkout</button>
+          <button id="shareLocationBtn" class="px-3 py-2 rounded-2xl border border-gray-800 text-sm text-gray-300">Share Location</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Orders & Chat -->
+    <div class="glass p-6 rounded-2xl col-span-1">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-sm text-gray-400">Orders</div>
+          <div class="text-lg font-semibold">Recent & Active</div>
+        </div>
+        <div class="text-xs text-gray-400">Sync</div>
+      </div>
+
+      <div id="ordersList" class="mt-4 space-y-3 max-h-64 overflow-auto pr-2"></div>
+
+      <hr class="my-4 border-gray-800" />
+
+      <div>
+        <div class="text-sm text-gray-400">Chat</div>
+        <div id="chatMini" class="mt-3 text-sm text-gray-300">Open an order to chat with seller.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="floatingTotal" class="floating-total hidden">
+    <div class="text-xs">Cart Total</div>
+    <div id="totalAmount" class="text-2xl font-bold">Rp0</div>
+    <div class="mt-2 flex gap-2">
+      <button id="viewCartBtn" class="px-3 py-2 rounded-2xl bg-white/10">View</button>
+      <button id="payNowBtn" class="px-3 py-2 rounded-2xl bg-white/20">Pay</button>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div id="checkoutModal" class="fixed inset-0 z-50 hidden items-center justify-center p-6">
+    <div class="w-full max-w-2xl glass rounded-2xl p-4 relative">
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-lg font-semibold">Checkout</div>
+        <div class="text-xs text-gray-400">Order summary & payment</div>
+      </div>
+
+      <div id="checkoutSummary" class="max-h-64 overflow-auto p-2 border border-gray-800 rounded-2xl"></div>
+
+      <div class="mt-3 space-y-2">
+        <input id="buyerAddress" class="w-full p-3 rounded-2xl glass border border-gray-800 text-sm outline-none" placeholder="Delivery address" />
+        <input id="buyerNotes" class="w-full p-3 rounded-2xl glass border border-gray-800 text-sm outline-none" placeholder="Notes (optional)" />
+        <div class="flex gap-2">
+          <select id="paymentMethod" class="p-3 rounded-2xl glass border border-gray-800 w-full">
+            <option value="Cash">Cash</option>
+            <option value="Transfer">Transfer</option>
+            <option value="E-wallet">E-wallet</option>
+          </select>
+          <button id="placeOrderBtn" class="neon-btn">Place Order</button>
+        </div>
+      </div>
+
+      <button id="closeCheckout" class="absolute top-3 right-3 text-gray-400">✕</button>
+    </div>
+  </div>
+
+  <!-- Order Chat Modal -->
+  <div id="orderChatModal" class="fixed inset-0 z-60 hidden items-center justify-center p-6">
+    <div class="w-full max-w-md glass rounded-2xl p-4 relative">
+      <div class="flex items-center justify-between mb-3">
+        <div id="orderChatHeader" class="text-lg font-semibold">Order Chat</div>
+        <div class="text-xs text-gray-400" id="orderChatStatus">Status</div>
+      </div>
+
+      <div id="orderChatMessages" style="height:320px;overflow:auto;padding:8px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)"></div>
+
+      <div class="mt-3 flex gap-2">
+        <input id="orderChatInput" class="flex-1 p-3 rounded-2xl glass border border-gray-800 text-sm outline-none" placeholder="Message..." />
+        <button id="orderChatSend" class="neon-btn">Send</button>
+      </div>
+
+      <button id="closeOrderChat" class="absolute top-3 right-3 text-gray-400">✕</button>
+    </div>
+  </div>
+
+  <!-- Map Modal -->
+  <div id="mapModal" class="fixed inset-0 z-70 hidden items-center justify-center p-6">
+    <div class="w-full max-w-3xl glass rounded-2xl p-4 relative">
+      <div class="flex items-center justify-between mb-3">
+        <div class="text-lg font-semibold">Delivery Location</div>
+        <div class="text-xs text-gray-400">Preview</div>
+      </div>
+      <div id="mapFrameWrap" style="height:420px;border-radius:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.03)"></div>
+      <button id="closeMap" class="absolute top-3 right-3 text-gray-400">✕</button>
+    </div>
+  </div>
+
+<script src="buyer.js"></script>
+</body>
+</html>
